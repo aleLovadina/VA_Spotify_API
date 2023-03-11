@@ -1,0 +1,5 @@
+__pycache__/
+cookies.pkl
+.cache
+credentials.py
+chromedriver.exe
