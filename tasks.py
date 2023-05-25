@@ -1,4 +1,4 @@
-import credentials
+import os
 import pickle
 import spotipy
 from selenium import webdriver
@@ -26,8 +26,9 @@ class StatusCode(Enum):
     STOP = 102
 
 #Creation of browser using chromedriver
-def web_browser():  
-    webdriver_service = Service(credentials.driver_path)
+def web_browser(): 
+    #webdriver_service = Service(r'C:\Program Files\Google\Chrome\Application\chromedriver.exe')
+    webdriver_service = Service(os.getenv('Chromedriver'))
     
     #chromedriver options
     chrome_options=Options()
@@ -44,8 +45,8 @@ def web_browser():
 
 #Creation of headless browser to create cookies
 def headless_browser():
-    webdriver_service = Service(credentials.driver_path)
-        
+    webdriver_service = Service(os.getenv('Chromedriver'))        
+    
     #chromedriver options
     chrome_options=Options()
     chrome_options.add_argument("--no-sandbox")
@@ -67,7 +68,7 @@ def login(browser, email, password):
     #Check if cookies already exist or not
     def check_cookies():
         try: 
-            with open('.\cookies.pkl', 'rb') as cookies:
+            with open('.\data\cookies.pkl', 'rb') as cookies:
                 pickle.load(cookies)
             return StatusCode.OK.value
         except FileNotFoundError:   
@@ -75,7 +76,7 @@ def login(browser, email, password):
     
     #load cookies
     def load_cookies():
-        cookies=pickle.load(open('.\cookies.pkl', 'rb'))
+        cookies=pickle.load(open('.\data\cookies.pkl', 'rb'))
         for cookie in cookies:
             cookie['domain']='.spotify.com'
             try:
@@ -114,15 +115,15 @@ def login(browser, email, password):
         logbutton = hl_browser.find_element(By.XPATH, '//*[@id="login-button"]')
         logbutton.click()
 
-        #wait for page to load
+        #wait for page to load 
         try:
-            WebDriverWait(hl_browser, 20).until(EC.presence_of_element_located((By.XPATH, '//*[@id="main"]/div/div[2]/div[2]/footer/div/div[2]/div/div[1]/button')))
+            WebDriverWait(hl_browser, 20).until(EC.presence_of_element_located((By.XPATH, '//*[@id="main"]/div/div[2]/div[3]/footer/div/div[2]/div/div[1]/button')))
         except TimeoutException:
             return StatusCode.UNAUTHORIZED.value
         
         #cookies creation
         cookies=hl_browser.get_cookies()
-        pickle.dump(cookies , open("cookies.pkl","wb"))
+        pickle.dump(cookies , open(".\data\cookies.pkl","wb"))
 
         hl_browser.quit()
 
@@ -135,13 +136,13 @@ def login(browser, email, password):
 
     #wait for page to load
     try:
-        WebDriverWait(browser, 20).until(EC.presence_of_element_located((By.XPATH, '//*[@id="main"]/div/div[2]/nav/div[1]/ul/li[1]/a')))
+        WebDriverWait(browser, 20).until(EC.presence_of_element_located((By.XPATH, '//*[@id="main"]/div/div[2]/div[2]/nav/div[1]/ul/li[1]/a')))
         #print('page ready')
     except TimeoutException:
         return StatusCode.SERVER_ERROR.value
     
-    #clicking the home button (link) to activate the web player
-    (browser.find_element(By.CLASS_NAME, 'eNs6P3JYpf2LScgTDHc6')).click()
+    #clicking the home button (link) to activate the web player LU0q0itTx2613uiATSig
+    (browser.find_element(By.CLASS_NAME, 'mnipjT4SLDMgwiDCEnRC')).click()
     
 def spotipy_object(client_id, client_secret, redirect_uri):
     #Creation of Spotipy API object

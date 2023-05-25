@@ -1,5 +1,5 @@
 __pycache__/
 cookies.pkl
 .cache
-credentials.py
+spotify_config.json
 chromedriver.exe
